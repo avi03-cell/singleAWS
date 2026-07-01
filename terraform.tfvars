@@ -73,3 +73,5 @@ tags = {
   Project   = "AWS VPC ALB EC2 Architecture"
   ManagedBy = "Terraform"
 }
+domain_name = "avneet.site"
+
