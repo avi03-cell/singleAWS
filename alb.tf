@@ -85,21 +85,44 @@ resource "aws_lb_target_group_attachment" "ec2_attach" {
 # LISTENER (HTTP :80)
 #############################################################
 
-resource "aws_lb_listener" "http_listener" {
 
+
+resource "aws_lb_listener" "https_listener" {
+  load_balancer_arn = aws_lb.app_alb.arn
+  port              = 443
+  protocol          = "HTTPS"
+
+  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  certificate_arn   = aws_acm_certificate.cert.arn
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.app_tg.arn
+  }
+}
+
+resource "aws_lb_listener" "http" {
   load_balancer_arn = aws_lb.app_alb.arn
   port              = 80
   protocol          = "HTTP"
 
-  ###########################################################
-  # Forward traffic to Target Group
-  ###########################################################
-
   default_action {
+    type = "redirect"
 
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.app_tg.arn
-
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
   }
-
 }
+
+resource "aws_acm_certificate" "cert" {
+  domain_name       = var.domain_name
+  validation_method = "DNS"
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
