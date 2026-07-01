@@ -135,3 +135,10 @@ variable "tags" {
 
   default = {}
 }
+
+variable "domain_name" {
+  description = "Your custom domain name (e.g. example.com)"
+  type        = string
+}
+
+
